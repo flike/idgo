@@ -1,8 +1,8 @@
 # idgo 简介
 
 idgo是一个利用MySQL批量生成ID的ID生成器, 主要有以下特点:
-- 由于每次都是通过事务批量取ID的方式,所以性能可以很好,且不会对MySQL造成压力.
-- 利用MySQL持久化特性,当ID生成器服务崩溃后,可以继续生成有效ID,避免了ID回绕的风险.
+- 每次通过事务批量取ID,性能较高,且不会对MySQL造成压力.
+- 当ID生成器服务崩溃后,可以继续生成有效ID,避免了ID回绕的风险.
 
 业界已经有利于MySQL生成ID的方案,都是通过:
 
@@ -10,7 +10,7 @@ idgo是一个利用MySQL批量生成ID的ID生成器, 主要有以下特点:
 REPLACE INTO Tickets64 (stub) VALUES ('a');
 SELECT LAST_INSERT_ID();
 ```
-这种方式生成ID,这种方式生成ID的弊端就是每生成一个ID都需要查询一下MySQL;当ID生成过快时,会对MySQL造成很大的压力.
+这种方式生成ID的弊端就是每生成一个ID都需要查询一下MySQL,当ID生成过快时会对MySQL造成很大的压力.
 这正是我写这个lib库的原因.
 
 # idgo服务正确性和高可用保障措施
@@ -37,6 +37,10 @@ SELECT LAST_INSERT_ID();
 ## 3.ID生成服务宕机后的恢复方案
 
 当idgo服务意外宕机后，可以切从库，然后将idgo对应的key加上适当的偏移量。
+
+## 4. 使用方法
+
+参考cmd/example.go文件使用, 用起来很简单. :)
 
 # License
 
