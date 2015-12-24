@@ -1,0 +1,8 @@
+bin
+pkg
+.DS_Store
+y.output
+.idea
+*.iml
+build_config.mk
+
