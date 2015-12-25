@@ -42,6 +42,14 @@ SELECT LAST_INSERT_ID();
 
 参考cmd/example.go文件使用, 用起来很简单. :)
 
+编译并运行example.go
+```
+. ./dev.sh
+make
+./bin/cmd
+
+```
+
 # License
 
 MIT
