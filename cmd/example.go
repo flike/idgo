@@ -105,7 +105,7 @@ func GetIdGenerator(db *sql.DB, key string) (*idgo.MySQLIdGenerator, error) {
 //get about 60 ids per second
 func MockGetId(idGenerator *idgo.MySQLIdGenerator, db *sql.DB, wg *sync.WaitGroup) {
 	defer wg.Done()
-	sqlFormat := "insert into %s(id_from_idgen) values(%d)"
+	sqlFormat := "insert into %s(id_from_idgo) values(%d)"
 	for running {
 		id, err := idGenerator.Next()
 		if err != nil {
