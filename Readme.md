@@ -31,8 +31,10 @@ SELECT LAST_INSERT_ID();
 
 ## 2.ID生成正确性验证
 
-模拟4个进程（cmd/example.go）以每秒生成100个ID的频率并发向MySQL IDGEN服务申请ID，并将生成的ID写入MySQL。
+- 模拟4个进程（cmd/example.go）以每秒生成100个ID的频率并发向MySQL IDGEN服务申请ID，并将生成的ID写入MySQL。
 测试16小时后，生成330万个ID，未发现有重复ID。
+
+- idgo已经部署在线上稳定运行。
 
 ## 3.ID生成服务宕机后的恢复方案
 
