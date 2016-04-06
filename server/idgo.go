@@ -1,4 +1,4 @@
-package idgo
+package server
 
 import (
 	"database/sql"
@@ -61,7 +61,7 @@ func NewMySQLIdGenerator(db *sql.DB, section string) (*MySQLIdGenerator, error) 
 }
 
 func (m *MySQLIdGenerator) SetSection(key string) error {
-	m.key = "mysql_ids_" + key
+	m.key = key
 	return nil
 }
 
@@ -172,6 +172,10 @@ func (m *MySQLIdGenerator) Reset(idOffset int64, force bool) error {
 	defer m.lock.Unlock()
 
 	if force == true {
+		_, err = m.db.Exec(dropTableSQL)
+		if err != nil {
+			return err
+		}
 		_, err = m.db.Exec(createTableSQL)
 		if err != nil {
 			return err
@@ -217,24 +221,15 @@ func (m *MySQLIdGenerator) Reset(idOffset int64, force bool) error {
 	return nil
 }
 
-func (m *MySQLIdGenerator) IsKeyExist() (bool, error) {
-	var tableName string
-	var haveValue bool
-	getKeySQL := fmt.Sprintf(GetKeySQLFormat, m.key)
-	rows, err := m.db.Query(getKeySQL)
+func (m *MySQLIdGenerator) DelKeyTable(key string) error {
+	dropTableSQL := fmt.Sprintf(DropTableSQLFormat, key)
+
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	_, err := m.db.Exec(dropTableSQL)
 	if err != nil {
-		return false, err
+		return err
 	}
-	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(&tableName)
-		if err != nil {
-			return false, err
-		}
-		haveValue = true
-	}
-	if haveValue == false {
-		return false, nil
-	}
-	return true, nil
+	return nil
 }

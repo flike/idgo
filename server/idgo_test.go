@@ -1,4 +1,4 @@
-package idgo
+package server
 
 import (
 	"database/sql"
@@ -39,13 +39,6 @@ func TestMySQLIdgen(t *testing.T) {
 	err = idGenerator.Reset(1, false)
 	if err != nil {
 		t.Fatal(err.Error())
-	}
-	isExist, err := idGenerator.IsKeyExist()
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	if isExist != true {
-		t.Fatal("isExist isn't correct")
 	}
 	//10 goroutine
 	wg.Add(10)
