@@ -1,4 +1,5 @@
 ## 1. Overview [中文主页](Readme_zh.md)
+[![Build Status](https://travis-ci.org/flike/idgo.svg?branch=master)](https://travis-ci.org/flike/idgo)
 
 Idgo is an id generator which can generate batch ids through MySQL transcation way. Its features as follows:
 
