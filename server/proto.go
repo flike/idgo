@@ -208,14 +208,14 @@ func writeBytes(value interface{}, w io.Writer) (int64, error) {
 		if len(v) == 0 {
 			return writeNullBytes(w)
 		}
-		if wrote, err := w.Write([]byte("$" + strconv.Itoa(len(v)) + "\r\n")); err != nil {
-			return int64(wrote), err
-		} else if wroteData, err := w.Write([]byte(v)); err != nil {
-			return int64(wrote + wroteData), err
-		} else {
-			wroteCRLF, err := w.Write([]byte("\r\n"))
-			return int64(wrote + wroteData + wroteCRLF), err
+		buf := []byte("$" + strconv.Itoa(len(v)) + "\r\n")
+		buf = append(buf, v...)
+		buf = append(buf, []byte("\r\n")...)
+		n, err := w.Write(buf)
+		if err != nil {
+			return 0, err
 		}
+		return int64(n), nil
 	case int:
 		wrote, err := w.Write([]byte(":" + strconv.Itoa(v) + "\r\n"))
 		return int64(wrote), err

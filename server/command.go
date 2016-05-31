@@ -1,5 +1,7 @@
 package server
 
+import "strconv"
+
 func (s *Server) handleGet(r *Request) Reply {
 	var idgen *MySQLIdGenerator
 	var ok, isExist bool
@@ -49,8 +51,9 @@ func (s *Server) handleGet(r *Request) Reply {
 		}
 	}
 
-	return &IntReply{
-		number: id,
+	idStr := strconv.FormatInt(id, 10)
+	return &BulkReply{
+		value: []byte(idStr),
 	}
 }
 
