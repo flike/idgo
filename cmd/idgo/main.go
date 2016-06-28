@@ -15,7 +15,7 @@ import (
 	"github.com/flike/idgo/server"
 )
 
-var configFile *string = flag.String("config", "etc/idgo.conf", "idgo config file")
+var configFile *string = flag.String("config", "etc/idgo.toml", "idgo config file")
 var logLevel *string = flag.String("log-level", "", "log level [debug|info|warn|error], default error")
 
 const (
