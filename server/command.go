@@ -18,7 +18,6 @@ func (s *Server) handleGet(r *Request) Reply {
 	}
 	s.Lock()
 	idgen, ok = s.keyGeneratorMap[idGenKey]
-	s.Unlock()
 
 	if ok == false {
 		isExist, err = s.IsKeyExist(idGenKey)
@@ -34,9 +33,7 @@ func (s *Server) handleGet(r *Request) Reply {
 					message: err.Error(),
 				}
 			}
-			s.Lock()
 			s.keyGeneratorMap[idGenKey] = idgen
-			s.Unlock()
 		} else {
 			return &IntReply{
 				number: 0,
@@ -44,6 +41,7 @@ func (s *Server) handleGet(r *Request) Reply {
 		}
 	}
 
+	s.Unlock()
 	id, err = idgen.Next()
 	if err != nil {
 		return &ErrorReply{
@@ -77,7 +75,6 @@ func (s *Server) handleSet(r *Request) Reply {
 	}
 	s.Lock()
 	idgen, ok = s.keyGeneratorMap[idGenKey]
-	s.Unlock()
 	if ok == false {
 		idgen, err = NewMySQLIdGenerator(s.db, idGenKey)
 		if err != nil {
@@ -85,11 +82,10 @@ func (s *Server) handleSet(r *Request) Reply {
 				message: err.Error(),
 			}
 		}
-		s.Lock()
 		s.keyGeneratorMap[idGenKey] = idgen
-		s.Unlock()
 	}
 
+	s.Unlock()
 	err = idgen.Reset(idValue, false)
 	if err != nil {
 		return &ErrorReply{
