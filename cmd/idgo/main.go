@@ -64,6 +64,14 @@ func main() {
 		return
 	}
 
+	err = s.Init()
+	if err != nil {
+		golog.Error("main", "main", err.Error(), 0)
+		golog.GlobalLogger.Close()
+		s.Close()
+		return
+	}
+
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc,
 		syscall.SIGHUP,

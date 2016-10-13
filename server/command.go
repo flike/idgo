@@ -4,7 +4,7 @@ import "strconv"
 
 func (s *Server) handleGet(r *Request) Reply {
 	var idgen *MySQLIdGenerator
-	var ok, isExist bool
+	var ok bool
 	var id int64
 	var err error
 
@@ -20,24 +20,9 @@ func (s *Server) handleGet(r *Request) Reply {
 	idgen, ok = s.keyGeneratorMap[idGenKey]
 
 	if ok == false {
-		isExist, err = s.IsKeyExist(idGenKey)
-		if err != nil {
-			return &ErrorReply{
-				message: err.Error(),
-			}
-		}
-		if isExist {
-			idgen, err = NewMySQLIdGenerator(s.db, idGenKey)
-			if err != nil {
-				return &ErrorReply{
-					message: err.Error(),
-				}
-			}
-			s.keyGeneratorMap[idGenKey] = idgen
-		} else {
-			return &IntReply{
-				number: 0,
-			}
+		s.Unlock()
+		return &IntReply{
+			number: 0,
 		}
 	}
 
@@ -78,6 +63,7 @@ func (s *Server) handleSet(r *Request) Reply {
 	if ok == false {
 		idgen, err = NewMySQLIdGenerator(s.db, idGenKey)
 		if err != nil {
+			s.Unlock()
 			return &ErrorReply{
 				message: err.Error(),
 			}
@@ -86,6 +72,13 @@ func (s *Server) handleSet(r *Request) Reply {
 	}
 
 	s.Unlock()
+	err = s.SetKey(idGenKey)
+	if err != nil {
+		return &ErrorReply{
+			message: err.Error(),
+		}
+	}
+
 	err = idgen.Reset(idValue, false)
 	if err != nil {
 		return &ErrorReply{
@@ -143,6 +136,12 @@ func (s *Server) handleDel(r *Request) Reply {
 	s.Unlock()
 	if ok {
 		err := idgen.DelKeyTable(idGenKey)
+		if err != nil {
+			return &ErrorReply{
+				message: err.Error(),
+			}
+		}
+		err = s.DelKey(idGenKey)
 		if err != nil {
 			return &ErrorReply{
 				message: err.Error(),
