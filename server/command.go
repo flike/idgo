@@ -129,6 +129,7 @@ func (s *Server) handleExists(r *Request) Reply {
 func (s *Server) handleDel(r *Request) Reply {
 	var idgen *MySQLIdGenerator
 	var ok bool
+	var id int64 = 0
 
 	if r.HasArgument(0) == false {
 		return ErrNotEnoughArgs
@@ -151,9 +152,10 @@ func (s *Server) handleDel(r *Request) Reply {
 				message: err.Error(),
 			}
 		}
+		id = 1
 	}
 
-	return &StatusReply{
-		code: "OK",
+	return &IntReply{
+		number: id,
 	}
 }
