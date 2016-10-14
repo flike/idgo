@@ -11,6 +11,27 @@ import (
 	"github.com/flike/idgo/config"
 )
 
+const (
+	KeyRecordTableName         = "__idgo__"
+	CreateRecordTableSQLFormat = `
+	CREATE TABLE %s (
+    k VARCHAR(255) NOT NULL,
+    PRIMARY KEY (k)
+) ENGINE=Innodb DEFAULT CHARSET=utf8 `
+
+	//create key table if not exist
+	CreateRecordTableNTSQLFormat = `
+	CREATE TABLE IF NOT EXISTS %s (
+    k VARCHAR(255) NOT NULL,
+    PRIMARY KEY (k)
+) ENGINE=Innodb DEFAULT CHARSET=utf8 `
+
+	InsertKeySQLFormat  = "INSERT INTO %s (k) VALUES ('%s')"
+	SelectKeySQLFormat  = "SELECT k FROM %s WHERE k = '%s'"
+	SelectKeysSQLFormat = "SELECT k FROM %s"
+	DeleteKeySQLFormat  = "DELETE FROM %s WHERE k = '%s'"
+)
+
 type Server struct {
 	cfg *config.Config
 
@@ -62,6 +83,44 @@ func NewServer(c *config.Config) (*Server, error) {
 	)
 
 	return s, nil
+}
+
+func (s *Server) Init() error {
+	createTableNtSQL := fmt.Sprintf(CreateRecordTableNTSQLFormat, KeyRecordTableName)
+	selectKeysSQL := fmt.Sprintf(SelectKeysSQLFormat, KeyRecordTableName)
+	_, err := s.db.Exec(createTableNtSQL)
+	if err != nil {
+		return err
+	}
+	rows, err := s.db.Query(selectKeysSQL)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		idGenKey := ""
+		err := rows.Scan(&idGenKey)
+		if err != nil {
+			return err
+		}
+		if idGenKey != "" {
+			idgen, ok := s.keyGeneratorMap[idGenKey]
+			if ok == false {
+				isExist, err := s.IsKeyExist(idGenKey)
+				if err != nil {
+					return err
+				}
+				if isExist {
+					idgen, err = NewMySQLIdGenerator(s.db, idGenKey)
+					if err != nil {
+						return err
+					}
+					s.keyGeneratorMap[idGenKey] = idgen
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func (s *Server) Serve() error {
@@ -164,4 +223,58 @@ func (s *Server) IsKeyExist(key string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func (s *Server) GetKey(key string) (string, error) {
+	keyName := ""
+	selectKeySQL := fmt.Sprintf(SelectKeySQLFormat, KeyRecordTableName, key)
+	rows, err := s.db.Query(selectKeySQL)
+	if err != nil {
+		return keyName, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&keyName)
+		if err != nil {
+			return keyName, err
+		}
+	}
+	if keyName == "" {
+		return keyName, fmt.Errorf("%s:not exists key", key)
+	}
+	return keyName, nil
+}
+
+func (s *Server) SetKey(key string) error {
+	if len(key) == 0 {
+		return fmt.Errorf("%s:invalid key", key)
+	}
+	_, err := s.GetKey(key)
+	if err == nil {
+		return nil
+	} else {
+		insertKeySQL := fmt.Sprintf(InsertKeySQLFormat, KeyRecordTableName, key)
+		_, err = s.db.Exec(insertKeySQL)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
+func (s *Server) DelKey(key string) error {
+	if len(key) == 0 {
+		return fmt.Errorf("%s:invalid key", key)
+	}
+	_, err := s.GetKey(key)
+	if err == nil {
+		deletetKeySQL := fmt.Sprintf(DeleteKeySQLFormat, KeyRecordTableName, key)
+		_, err = s.db.Exec(deletetKeySQL)
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		return nil
+	}
 }
