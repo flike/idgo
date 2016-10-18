@@ -154,3 +154,18 @@ func (s *Server) handleDel(r *Request) Reply {
 		number: id,
 	}
 }
+
+func (s *Server) handleSelect(r *Request) Reply {
+	if r.HasArgument(0) == false {
+		return ErrNotEnoughArgs
+	}
+
+	num := string(r.Arguments[0])
+	if len(num) == 0 {
+		return ErrNotEnoughArgs
+	}
+
+	return &StatusReply{
+		code: "OK",
+	}
+}
