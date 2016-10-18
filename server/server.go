@@ -185,6 +185,8 @@ func (s *Server) ServeRequest(request *Request) Reply {
 		return s.handleExists(request)
 	case "DEL":
 		return s.handleDel(request)
+	case "SELECT":
+		return s.handleSelect(request)
 	default:
 		return ErrMethodNotSupported
 	}
