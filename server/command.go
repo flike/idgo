@@ -21,8 +21,8 @@ func (s *Server) handleGet(r *Request) Reply {
 
 	if ok == false {
 		s.Unlock()
-		return &IntReply{
-			number: 0,
+		return &BulkReply{
+			value: nil,
 		}
 	}
 
