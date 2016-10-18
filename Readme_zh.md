@@ -24,11 +24,12 @@ idgo和前端应用是才有redis协议通信的，然后每个`id_key`是存储
 idgo目前只支持四个redis命令：
 
 ```
-1 . SET key value,通过这个操作设置id生成器的初始值。
+1. SET key value,通过这个操作设置id生成器的初始值。
 例如：SET abc 123
 2. GET key,通过该命令获取id。
 3. EXISTS key,查看一个key是否存在。
 4. DEL key,删除一个key。
+5. SELECT index,选择一个db，目前是一个假方法，没实现任何功能，只是为了避免初始化客户端时调用SELECT出错。
 ```
 
 

@@ -30,6 +30,7 @@ Idgo only supports four commands of redis as follows:
 - `GET key`, get the value of key.
 - `EXISTS key`, check the key if exist.
 - `DEL key`, delete the key in idgo.
+- `SELECT index`, just a mock select command, prevent the select command error.
 
 ## 3. Install and use idgo
 
