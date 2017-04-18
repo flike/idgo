@@ -1,6 +1,6 @@
 # idgo 简介
 [![Build Status](https://travis-ci.org/flike/idgo.svg?branch=master)](https://travis-ci.org/flike/idgo)
-##1. idgo特点
+## 1. idgo特点
 
 idgo是一个利用MySQL批量生成ID的ID生成器, 主要有以下特点:
 
