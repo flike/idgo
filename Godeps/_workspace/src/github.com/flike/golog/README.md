@@ -1,8 +1,8 @@
-#golog
+# golog
 
 simple log library for Golang
 
-##case 
+## case 
 
 ```
 package main
