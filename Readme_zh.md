@@ -18,7 +18,7 @@ SELECT LAST_INSERT_ID();
 这种方式生成ID的弊端就是每生成一个ID都需要查询一下MySQL,当ID生成过快时会对MySQL造成很大的压力。这正式我开发这个项目的原因。服务端兼容Redis协议是为了避免单独开发和idgo通信的SDK。
 
 ## 2. idgo架构
-idgo和前端应用是才有redis协议通信的，然后每个`id_key`是存储在MySQL数据库中，每个key会在MySQL中生成一张表，表中只有一条记录。这样做的目的是保证当idgo由于意外崩溃后，`id_key`对应的值不会丢失，这样就避免产生了id回绕的风险。
+idgo和前端应用是采用redis协议通信的，然后每个`id_key`是存储在MySQL数据库中，每个key会在MySQL中生成一张表，表中只有一条记录。这样做的目的是保证当idgo由于意外崩溃后，`id_key`对应的值不会丢失，这样就避免产生了id回绕的风险。
 ![idgo_arch](http://ww2.sinaimg.cn/large/6e5705a5gw1f2nz3bot3tj20qo0k0mxe.jpg)
 
 idgo目前只支持四个redis命令：
