@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/flike/golog"
+
 	"github.com/flike/idgo/config"
 )
 
@@ -19,7 +20,7 @@ const (
     PRIMARY KEY (k)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8 `
 
-	//create key table if not exist
+	// create key table if not exist
 	CreateRecordTableNTSQLFormat = `
 	CREATE TABLE IF NOT EXISTS %s (
     k VARCHAR(255) NOT NULL,
@@ -47,10 +48,10 @@ func NewServer(c *config.Config) (*Server, error) {
 	s.cfg = c
 
 	var err error
-	//init db
+	// init db
 	proto := "mysql"
 	charset := "utf8"
-	//root:@tcp(127.0.0.1:3306)/test?charset=utf8
+	// root:@tcp(127.0.0.1:3306)/test?charset=utf8
 	url := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
 		c.DatabaseConfig.User,
 		c.DatabaseConfig.Password,
@@ -111,7 +112,7 @@ func (s *Server) Init() error {
 					return err
 				}
 				if isExist {
-					idgen, err = NewMySQLIdGenerator(s.db, idGenKey)
+					idgen, err = NewMySQLIdGenerator(s.db, idGenKey, BatchCount)
 					if err != nil {
 						return err
 					}
@@ -144,7 +145,7 @@ func (s *Server) onConn(conn net.Conn) error {
 		if err, ok := r.(error); ok {
 			const size = 4096
 			buf := make([]byte, size)
-			buf = buf[:runtime.Stack(buf, false)] //获得当前goroutine的stacktrace
+			buf = buf[:runtime.Stack(buf, false)] // 获得当前goroutine的stacktrace
 			golog.Error("server", "onConn", "error", 0,
 				"remoteAddr", clientAddr,
 				"stack", string(buf),

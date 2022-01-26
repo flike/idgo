@@ -40,7 +40,7 @@ func (s *Server) handleGet(r *Request) Reply {
 	}
 }
 
-//redis command(set abc 12)
+// redis command(set abc 12)
 func (s *Server) handleSet(r *Request) Reply {
 	var idgen *MySQLIdGenerator
 	var ok bool
@@ -61,7 +61,7 @@ func (s *Server) handleSet(r *Request) Reply {
 	s.Lock()
 	idgen, ok = s.keyGeneratorMap[idGenKey]
 	if ok == false {
-		idgen, err = NewMySQLIdGenerator(s.db, idGenKey)
+		idgen, err = NewMySQLIdGenerator(s.db, idGenKey, BatchCount)
 		if err != nil {
 			s.Unlock()
 			return &ErrorReply{

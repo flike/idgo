@@ -1,0 +1,6 @@
+github.com/BurntSushi/toml v1.0.0 h1:dtDWrepsVPfW9H/4y7dDgFc2MBUSeJhlaDtK13CxFlU=
+github.com/BurntSushi/toml v1.0.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
+github.com/flike/golog v0.0.0-20150625093146-d59ac6dad9f0 h1:arbHc2l82wtD1t8yO2qcj8zRkw9A870PlwftSm53REs=
+github.com/flike/golog v0.0.0-20150625093146-d59ac6dad9f0/go.mod h1:nLPGt1XMR4Ol1YGuf2UheT7FcT2I4soUaEXamF9PMFk=
+github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
+github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
