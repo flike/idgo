@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	//create key table
+	// create key table
 	CreateTableSQLFormat = `
 	CREATE TABLE %s (
     id bigint(20) unsigned NOT NULL auto_increment,
     PRIMARY KEY  (id)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8 `
 
-	//create key table if not exist
+	// create key table if not exist
 	CreateTableNTSQLFormat = `
 	CREATE TABLE IF NOT EXISTS %s (
     id bigint(20) unsigned NOT NULL auto_increment,
@@ -35,15 +35,15 @@ const (
 
 type MySQLIdGenerator struct {
 	db       *sql.DB
-	key      string //id generator key name
-	cur      int64  //current id
-	batchMax int64  //max id till get from mysql
-	batch    int64  //get batch count ids from mysql once
+	key      string // id generator key name
+	cur      int64  // current id
+	batchMax int64  // max id till get from mysql
+	batch    int64  // get batch count ids from mysql once
 
 	lock sync.Mutex
 }
 
-func NewMySQLIdGenerator(db *sql.DB, section string) (*MySQLIdGenerator, error) {
+func NewMySQLIdGenerator(db *sql.DB, section string, batchCount int64) (*MySQLIdGenerator, error) {
 	idGenerator := new(MySQLIdGenerator)
 	idGenerator.db = db
 	if len(section) == 0 {
@@ -54,7 +54,12 @@ func NewMySQLIdGenerator(db *sql.DB, section string) (*MySQLIdGenerator, error) 
 		return nil, err
 	}
 
-	idGenerator.batch = BatchCount
+	if batchCount != 0 {
+		idGenerator.batch = batchCount
+	} else {
+		idGenerator.batch = BatchCount
+	}
+
 	idGenerator.cur = 0
 	idGenerator.batchMax = idGenerator.cur
 	return idGenerator, nil
@@ -65,7 +70,7 @@ func (m *MySQLIdGenerator) SetSection(key string) error {
 	return nil
 }
 
-//get id from key table
+// get id from key table
 func (m *MySQLIdGenerator) getIdFromMySQL() (int64, error) {
 	var id int64
 	selectForUpdate := fmt.Sprintf(SelectForUpdate, m.key)
@@ -92,7 +97,7 @@ func (m *MySQLIdGenerator) getIdFromMySQL() (int64, error) {
 	return id, nil
 }
 
-//get current id
+// get current id
 func (m *MySQLIdGenerator) Current() (int64, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -127,7 +132,7 @@ func (m *MySQLIdGenerator) Next() (int64, error) {
 			}
 			haveValue = true
 		}
-		//When the idgo table has no id key
+		// When the idgo table has no id key
 		if haveValue == false {
 			return 0, fmt.Errorf("%s:have no id key", m.key)
 		}
@@ -138,7 +143,7 @@ func (m *MySQLIdGenerator) Next() (int64, error) {
 		}
 		tx.Commit()
 
-		//batchMax is larger than cur BatchCount
+		// batchMax is larger than cur BatchCount
 		m.batchMax = id + BatchCount
 		m.cur = id
 	}
@@ -160,8 +165,8 @@ func (m *MySQLIdGenerator) Init() error {
 	return nil
 }
 
-//if force is true, create table directly
-//if force is false, create table use CreateTableNTSQLFormat
+// if force is true, create table directly
+// if force is false, create table use CreateTableNTSQLFormat
 func (m *MySQLIdGenerator) Reset(idOffset int64, force bool) error {
 	var err error
 	createTableSQL := fmt.Sprintf(CreateTableSQLFormat, m.key)
@@ -186,7 +191,7 @@ func (m *MySQLIdGenerator) Reset(idOffset int64, force bool) error {
 		if err != nil {
 			return err
 		}
-		//check the idgo value if exist
+		// check the idgo value if exist
 		getRowCountSQL := fmt.Sprintf(GetRowCountSQLFormat, m.key)
 		rows, err := m.db.Query(getRowCountSQL)
 		if err != nil {

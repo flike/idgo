@@ -32,7 +32,7 @@ func GetId(idGenerator *MySQLIdGenerator) {
 }
 
 func TestMySQLIdgen(t *testing.T) {
-	idGenerator, err := NewMySQLIdGenerator(db, "mysql_victory")
+	idGenerator, err := NewMySQLIdGenerator(db, "mysql_victory", BatchCount)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -40,7 +40,7 @@ func TestMySQLIdgen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	//10 goroutine
+	// 10 goroutine
 	wg.Add(10)
 	for i := 0; i < 10; i++ {
 		go GetId(idGenerator)
@@ -54,7 +54,7 @@ func TestMySQLIdgen(t *testing.T) {
 }
 
 func BenchmarkMySQLIdgen(b *testing.B) {
-	idGenerator, err := NewMySQLIdGenerator(db, "mysql_file")
+	idGenerator, err := NewMySQLIdGenerator(db, "mysql_file", BatchCount)
 	if err != nil {
 		b.Fatal(err.Error())
 	}
